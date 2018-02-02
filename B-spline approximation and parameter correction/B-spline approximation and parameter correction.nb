@@ -1,0 +1,1946 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     74520,       1938]
+NotebookOptionsPosition[     74099,       1919]
+NotebookOutlinePosition[     74457,       1935]
+CellTagsIndexPosition[     74414,       1932]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ StyleBox["CSE 577 * Advanced Geometric Modeling\nInstructor: Dianne Hansford\
+\nStudent:Yu-Hsuan, Chuang\nStudent ID:1211219305\nHomework 2: B-spline \
+approximation with parameter correction\nDue 23 Feb 2017 by midnight\n\n",
+  FontSize->24,
+  FontWeight->"Bold"],
+ StyleBox["The red curve and orange line in the result represent the first \
+iteration, and the blue curve and cyan line represent the last iteration.\n\
+When change the manipulate parameter each time, it may need some times to \
+show the new result.\n",
+  FontSize->18,
+  FontWeight->"Bold",
+  FontColor->RGBColor[1, 0.5, 0]],
+ StyleBox["Implement Code",
+  FontSize->24,
+  FontWeight->"Bold",
+  FontColor->GrayLevel[0]]
+}], "Text",
+ CellChangeTimes->{
+  3.6967848731254873`*^9, {3.696784940807591*^9, 3.696784950421151*^9}, {
+   3.696891543434473*^9, 3.69689169579974*^9}, {3.6968917280490627`*^9, 
+   3.696891773599041*^9}, {3.696891908761896*^9, 3.696891945758175*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ StyleBox[
+  RowBox[{
+   RowBox[{"d1", " ", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"6", ",", "6"}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"3", ",", "9"}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "6"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"2", ",", "2"}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"6", ",", " ", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"10", ",", "2"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"12", ",", " ", "6"}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"9", ",", " ", "9"}], "}"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"6", ",", " ", "6.1"}], "}"}]}], "}"}]}], ";", 
+   RowBox[{"d2", " ", "=", " ", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"t", ",", 
+        RowBox[{
+         RowBox[{"Sqrt", "[", "t", "]"}], "+", 
+         RowBox[{"0.4", 
+          RowBox[{"RandomReal", "[", "]"}]}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"t", ",", "0.0", ",", "10.0", ",", 
+        RowBox[{"10", "/", "30"}]}], "}"}]}], "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{"d3", "=", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"i", ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Exp", "[", 
+           RowBox[{"-", "i"}], "]"}], 
+          RowBox[{"Sin", "[", 
+           RowBox[{"10", "Pi", " ", "i"}], "]"}]}], "+", 
+         RowBox[{"RandomReal", "[", ".1", "]"}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", "0", ",", "1", ",", ".02"}], "}"}]}], "]"}]}], ";"}],
+  
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{"d4", " ", "=", " ", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"t", "*", 
+          RowBox[{"Cos", "[", "t", "]"}]}], "+", 
+         RowBox[{"0.4", "*", 
+          RowBox[{"RandomReal", "[", "]"}]}]}], ",", " ", 
+        RowBox[{
+         RowBox[{"t", "*", 
+          RowBox[{"Sin", "[", "t", "]"}]}], "+", 
+         RowBox[{"0.4", 
+          RowBox[{"RandomReal", "[", "]"}]}]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"t", ",", "0.0", ",", "10.0", ",", 
+        RowBox[{"10", "/", "20"}]}], "}"}]}], "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ RowBox[{
+  StyleBox[
+   RowBox[{
+    RowBox[{"d5", "=", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"x", ",", "x"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"x", ",", "0", ",", "10"}], "}"}]}], "]"}]}], ";"}],
+   FontSize->18], 
+  StyleBox["\[IndentingNewLine]",
+   FontSize->18]}], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{
+    RowBox[{"dist", "[", "pts_", "]"}], ":=", 
+    RowBox[{"Accumulate", "[", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"EuclideanDistance", "[", 
+        RowBox[{
+         RowBox[{"pts", "[", 
+          RowBox[{"[", "i", "]"}], "]"}], ",", 
+         RowBox[{"pts", "[", 
+          RowBox[{"[", 
+           RowBox[{"i", "+", "1"}], "]"}], "]"}]}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", 
+         RowBox[{
+          RowBox[{"Length", "[", "pts", "]"}], "-", "1"}]}], "}"}]}], "]"}], 
+     "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{
+    RowBox[{"uparam", "[", "pts_", "]"}], ":=", 
+    RowBox[{"N", "[", 
+     RowBox[{"Prepend", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"dist", "[", "pts", "]"}], "/", 
+        RowBox[{"Last", "[", 
+         RowBox[{"dist", "[", "pts", "]"}], "]"}]}], ",", "0"}], "]"}], 
+     "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{
+    RowBox[{"ctrlparam", "[", 
+     RowBox[{"n_", ",", "pts_", ",", "param_"}], "]"}], ":=", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{"Table", "[", 
+       RowBox[{"0", ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "0", ",", "0"}], "}"}]}], "]"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"param", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j", ",", 
+             RowBox[{
+              RowBox[{"Length", "[", "pts", "]"}], "-", "n", "+", "j"}]}], 
+            "}"}]}], "]"}], "/", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"Length", "[", "pts", "]"}], "-", "n", "+", "1"}], ")"}]}],
+         ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "2", ",", 
+          RowBox[{"n", "-", "1"}]}], "}"}]}], "]"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{"1", ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "0", ",", "0"}], "}"}]}], "]"}]}], "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{
+    RowBox[{"kfun", "[", 
+     RowBox[{"d_", ",", "ctrlparam_"}], "]"}], ":=", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{"Table", "[", 
+       RowBox[{"0", ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "0", ",", "d"}], "}"}]}], "]"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Sum", "[", 
+          RowBox[{
+           RowBox[{"ctrlparam", "[", 
+            RowBox[{"[", "i", "]"}], "]"}], ",", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j", ",", 
+             RowBox[{"j", "+", "d", "-", "1"}]}], "}"}]}], "]"}], "/", "d"}], 
+        ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "2", ",", 
+          RowBox[{
+           RowBox[{"Length", "[", "ctrlparam", "]"}], "-", "d"}]}], "}"}]}], 
+       "]"}], ",", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{"1", ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "0", ",", "d"}], "}"}]}], "]"}]}], "]"}]}], ";"}],
+  FontSize->18], "\[IndentingNewLine]", 
+ StyleBox[
+  RowBox[{
+   RowBox[{
+    RowBox[{"mbasis", "[", 
+     RowBox[{"pts_", ",", "n_", ",", "d_", ",", "knot_"}], "]"}], ":=", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"param", "=", 
+        RowBox[{"uparam", "[", "pts", "]"}]}], "}"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"BSplineBasis", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"d", ",", "knot"}], "}"}], ",", 
+          RowBox[{"j", "-", "1"}], ",", 
+          RowBox[{"param", "[", 
+           RowBox[{"[", "i", "]"}], "]"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", 
+          RowBox[{"Length", "[", "param", "]"}]}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "n"}], "}"}]}], "]"}]}], "]"}]}], ";"}],
+  FontSize->18], "\n", 
+ RowBox[{
+  StyleBox[
+   RowBox[{
+    RowBox[{
+     RowBox[{"curve", "[", 
+      RowBox[{"pts_", ",", "knot_", ",", "d_", ",", "t_"}], "]"}], ":=", 
+     RowBox[{"Sum", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"BSplineBasis", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"d", ",", "knot"}], "}"}], ",", "i", ",", "t"}], "]"}], 
+        "*", 
+        RowBox[{"pts", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", "+", "1"}], "]"}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"i", ",", "0", ",", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"Length", "[", "pts", "]"}], "-", "1"}], ")"}]}], "}"}]}], 
+      "]"}]}], ";"}],
+   FontSize->18], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  StyleBox[
+   RowBox[{
+    RowBox[{
+     RowBox[{"correction", "[", 
+      RowBox[{
+      "k_", ",", "ti_", ",", "P_", ",", "data_", ",", "ctrlpts_", ",", 
+       "conknot_", ",", "d_"}], "]"}], ":=", "\[IndentingNewLine]", 
+     RowBox[{"(", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"errors", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"angles", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"tangent", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"newti", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"concurve", "[", "t_", "]"}], ":=", 
+        RowBox[{"Sum", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"BSplineBasis", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"d", ",", "conknot"}], "}"}], ",", "y", ",", "t"}], 
+            "]"}], "*", 
+           RowBox[{"ctrlpts", "[", 
+            RowBox[{"[", 
+             RowBox[{"y", "+", "1"}], "]"}], "]"}]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"y", ",", "0", ",", 
+            RowBox[{
+             RowBox[{"Length", "[", "ctrlpts", "]"}], "-", "1"}]}], "}"}]}], 
+         "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{
+              RowBox[{"EuclideanDistance", "[", 
+               RowBox[{
+                RowBox[{"data", "[", 
+                 RowBox[{"[", "j", "]"}], "]"}], ",", 
+                RowBox[{
+                 RowBox[{"concurve", "'"}], "[", 
+                 RowBox[{"ti", "[", 
+                  RowBox[{"[", "j", "]"}], "]"}], "]"}]}], "]"}], "\[Equal]", 
+              "0"}], "||", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"concurve", "'"}], "[", 
+               RowBox[{"ti", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], "]"}], "\[Equal]", 
+              RowBox[{"{", 
+               RowBox[{"0.", ",", "0."}], "}"}]}]}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"errors", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", "0"}], ";", 
+             RowBox[{
+              RowBox[{"angles", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", "0"}], ";", 
+             RowBox[{
+              RowBox[{"tangent", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", 
+              RowBox[{
+               RowBox[{"concurve", "'"}], "[", 
+               RowBox[{"ti", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], "]"}]}]}], ",", 
+            "\[IndentingNewLine]", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"errors", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", 
+              RowBox[{
+               RowBox[{"EuclideanDistance", "[", 
+                RowBox[{
+                 RowBox[{"data", "[", 
+                  RowBox[{"[", "j", "]"}], "]"}], ",", 
+                 RowBox[{"concurve", "[", 
+                  RowBox[{"ti", "[", 
+                   RowBox[{"[", "j", "]"}], "]"}], "]"}]}], "]"}], "*", 
+               RowBox[{"Cos", "[", 
+                RowBox[{"VectorAngle", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"concurve", "'"}], "[", 
+                   RowBox[{"ti", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], "]"}], ",", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"data", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], "-", 
+                    RowBox[{"concurve", "[", 
+                    RowBox[{"ti", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], "]"}]}], ")"}]}], "]"}], 
+                "]"}]}]}], ";", 
+             RowBox[{
+              RowBox[{"angles", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", 
+              RowBox[{"VectorAngle", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"concurve", "'"}], "[", 
+                 RowBox[{"ti", "[", 
+                  RowBox[{"[", "j", "]"}], "]"}], "]"}], ",", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{"data", "[", 
+                   RowBox[{"[", "j", "]"}], "]"}], "-", 
+                  RowBox[{"concurve", "[", 
+                   RowBox[{"ti", "[", 
+                    RowBox[{"[", "j", "]"}], "]"}], "]"}]}], ")"}]}], 
+               "]"}]}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"tangent", "[", 
+            RowBox[{"[", "j", "]"}], "]"}], "=", 
+           RowBox[{
+            RowBox[{"concurve", "'"}], "[", 
+            RowBox[{"ti", "[", 
+             RowBox[{"[", "j", "]"}], "]"}], "]"}]}]}], "\[IndentingNewLine]",
+          ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"errors", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"angles", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"tangent", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"tangent", "[", 
+         RowBox[{"[", "P", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"errors", "[", 
+         RowBox[{"[", "P", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"angles", "[", 
+         RowBox[{"[", "P", "]"}], "]"}], "=", "0"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"errortable", "[", 
+         RowBox[{"[", "k", "]"}], "]"}], "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"Norm", "[", 
+           RowBox[{"errors", "[", 
+            RowBox[{"[", "j", "]"}], "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"angletable", "[", 
+         RowBox[{"[", "k", "]"}], "]"}], "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"angles", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"tangenttable", "[", 
+         RowBox[{"[", "k", "]"}], "]"}], "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"tangent", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"sumcurve", "=", 
+        RowBox[{"Sum", "[", 
+         RowBox[{
+          RowBox[{"EuclideanDistance", "[", 
+           RowBox[{
+            RowBox[{"concurve", "[", 
+             RowBox[{"ti", "[", 
+              RowBox[{"[", 
+               RowBox[{"i", "+", "1"}], "]"}], "]"}], "]"}], ",", 
+            RowBox[{"concurve", "[", 
+             RowBox[{"ti", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], "]"}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"i", ",", "1", ",", 
+            RowBox[{"P", "-", "1"}]}], "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Do", "[", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"(", "\[IndentingNewLine]", 
+          RowBox[{
+           RowBox[{"newtii", "=", 
+            RowBox[{
+             RowBox[{"ti", "[", 
+              RowBox[{"[", "j", "]"}], "]"}], "+", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"errors", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], "/", "sumcurve"}], ")"}]}]}], 
+           ";", "\[IndentingNewLine]", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"newtii", ">=", 
+               RowBox[{"ti", "[", 
+                RowBox[{"[", 
+                 RowBox[{"j", "+", "1"}], "]"}], "]"}]}], "||", 
+              RowBox[{"newtii", "<=", 
+               RowBox[{"ti", "[", 
+                RowBox[{"[", 
+                 RowBox[{"j", "-", "1"}], "]"}], "]"}]}]}], ",", 
+             "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"newti", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", 
+              RowBox[{"ti", "[", 
+               RowBox[{"[", "j", "]"}], "]"}]}], ",", "\[IndentingNewLine]", 
+             RowBox[{
+              RowBox[{"newti", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "=", 
+              RowBox[{
+               RowBox[{"ti", "[", 
+                RowBox[{"[", "j", "]"}], "]"}], "+", 
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"errors", "[", 
+                  RowBox[{"[", "j", "]"}], "]"}], "/", "sumcurve"}], 
+                ")"}]}]}]}], "]"}]}], "\[IndentingNewLine]", ")"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", "2", ",", 
+           RowBox[{"P", "-", "1"}]}], "}"}]}], "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"newti", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "=", 
+        RowBox[{
+         RowBox[{"ti", "[", 
+          RowBox[{"[", "1", "]"}], "]"}], "+", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"errors", "[", 
+            RowBox[{"[", "1", "]"}], "]"}], "/", "sumcurve"}], ")"}]}]}], ";",
+        "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"newti", "[", 
+         RowBox[{"[", "P", "]"}], "]"}], "=", 
+        RowBox[{
+         RowBox[{"ti", "[", 
+          RowBox[{"[", "P", "]"}], "]"}], "+", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"errors", "[", 
+            RowBox[{"[", "P", "]"}], "]"}], "/", "sumcurve"}], ")"}]}]}], ";",
+        "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Return", "[", "newti", "]"}], ";"}], "\[IndentingNewLine]", 
+      ")"}]}], ";"}],
+   FontSize->18], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  StyleBox["Manipulate",
+   FontSize->18], 
+  StyleBox["[",
+   FontSize->18], 
+  StyleBox["\[IndentingNewLine]",
+   FontSize->18], 
+  RowBox[{
+   RowBox[{
+    StyleBox[
+     RowBox[{"data", "=", "dataset"}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"datapointsplot", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{"{", 
+        RowBox[{"Black", ",", 
+         RowBox[{"PointSize", "[", "0.015", "]"}], ",", 
+         RowBox[{"Point", "[", "data", "]"}], ",", 
+         RowBox[{"PointSize", "[", "0.02", "]"}], ",", 
+         RowBox[{"Point", "[", 
+          RowBox[{"data", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "}"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"datalineplot", "=", 
+      RowBox[{"ListLinePlot", "[", "data", "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"P", "=", 
+      RowBox[{"Length", "[", "data", "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"d", "=", 
+      RowBox[{"numcontrolpoint", "-", "L"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"(*", 
+      RowBox[{"--", 
+       RowBox[{"--", 
+        RowBox[{"--", 
+         RowBox[{"--", 
+          RowBox[{"--", 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Initialize", "--"}], "--"}], "--"}], "--"}], 
+                    "--"}], "--"}], "--"}], "--"}], "--"}], "--"}], "--"}], 
+                    "--"}], "--"}], "--"}], 
+                    "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}]}]}], "*)"}],
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"controlpoint", "=", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "numcontrolpoint"}], "}"}]}], "]"}], 
+        ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "100"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"errortable", " ", "=", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "100"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"angletable", " ", "=", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "100"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"tangenttable", "=", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "100"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"titable", "=", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"i", ",", "1", ",", "100"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"--", 
+        RowBox[{"--", 
+         RowBox[{"--", 
+          RowBox[{"--", 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", 
+                    RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], 
+       RowBox[{"datapoint", "'"}], "s", " ", 
+       RowBox[{"ti", "--"}], 
+       RowBox[{"--", 
+        RowBox[{"--", 
+         RowBox[{"--", 
+          RowBox[{"--", 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], "*)"}],
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"ti", "=", 
+      RowBox[{"uparam", "[", "data", "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"--", 
+        RowBox[{"--", 
+         RowBox[{"--", 
+          RowBox[{"--", 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", 
+                    RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], 
+       "iteration", " ", 
+       RowBox[{"start", "--"}], 
+       RowBox[{"--", 
+        RowBox[{"--", 
+         RowBox[{"--", 
+          RowBox[{"--", 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], "*)"}],
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"Do", "[", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"(", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"titable", "[", 
+           RowBox[{"[", "k", "]"}], "]"}], "=", "ti"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], "least", 
+           " ", "squar", " ", 
+           RowBox[{"knot", "--"}], 
+           RowBox[{"--", 
+            RowBox[{"--", 
+             RowBox[{"--", 
+              RowBox[{"--", 
+               RowBox[{"--", 
+                RowBox[{"--", 
+                 RowBox[{"--", 
+                  RowBox[{"--", 
+                   RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", 
+                    RowBox[{"--", "--"}]}]}]}]}]}]}]}]}]}]}]}]}]}], "*)"}], 
+         "\[IndentingNewLine]", 
+         RowBox[{"ctrlparameter", "=", 
+          RowBox[{"ctrlparam", "[", 
+           RowBox[{"numcontrolpoint", ",", "data", ",", "ti"}], "]"}]}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"knot", "=", 
+          RowBox[{"kfun", "[", 
+           RowBox[{"d", ",", "ctrlparameter"}], "]"}]}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"ctrlpts", "=", 
+          RowBox[{"LeastSquares", "[", 
+           RowBox[{
+            RowBox[{"mbasis", "[", 
+             RowBox[{"data", ",", "numcontrolpoint", ",", "d", ",", "knot"}], 
+             "]"}], ",", "data"}], "]"}]}], ";", "\[IndentingNewLine]", 
+         RowBox[{
+          RowBox[{"controlpoint", "[", 
+           RowBox[{"[", "k", "]"}], "]"}], "=", "ctrlpts"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"numcontrolpoint", "=", 
+          RowBox[{"Length", "[", "ctrlpts", "]"}]}], ";", 
+         "\[IndentingNewLine]", "\[IndentingNewLine]", 
+         RowBox[{"conparam", "=", 
+          RowBox[{"uparam", "[", "ctrlpts", "]"}]}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"conknot", "=", 
+          RowBox[{"kfun", "[", 
+           RowBox[{"d", ",", "conparam"}], "]"}]}], ";", 
+         "\[IndentingNewLine]", "\[IndentingNewLine]", 
+         RowBox[{"ti", "=", 
+          RowBox[{"correction", "[", 
+           RowBox[{
+           "k", ",", "ti", ",", "P", ",", "data", ",", "ctrlpts", ",", 
+            "conknot", ",", "d"}], "]"}]}]}], "\[IndentingNewLine]", 
+        "\[IndentingNewLine]", ")"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"k", ",", "1", ",", "iter"}], "}"}]}], "]"}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"first", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{"{", 
+        RowBox[{"Red", ",", 
+         RowBox[{"BSplineCurve", "[", 
+          RowBox[{
+           RowBox[{"controlpoint", "[", 
+            RowBox[{"[", "1", "]"}], "]"}], ",", 
+           RowBox[{"SplineDegree", "\[Rule]", "d"}]}], "]"}], ",", "Orange", 
+         ",", 
+         RowBox[{"Line", "[", 
+          RowBox[{"controlpoint", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "]"}], ",", "Orange", ",", 
+         RowBox[{"Point", "[", 
+          RowBox[{"controlpoint", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "]"}]}], "}"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"last", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{"{", 
+        RowBox[{"Blue", ",", 
+         RowBox[{"BSplineCurve", "[", 
+          RowBox[{
+           RowBox[{"controlpoint", "[", 
+            RowBox[{"[", "iter", "]"}], "]"}], ",", 
+           RowBox[{"SplineDegree", "\[Rule]", "d"}]}], "]"}], ",", "Cyan", 
+         ",", 
+         RowBox[{"Line", "[", 
+          RowBox[{"controlpoint", "[", 
+           RowBox[{"[", "iter", "]"}], "]"}], "]"}], ",", "Cyan", ",", 
+         RowBox[{"Point", "[", 
+          RowBox[{"controlpoint", "[", 
+           RowBox[{"[", "iter", "]"}], "]"}], "]"}]}], "}"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firstavgerr", "=", 
+      RowBox[{"Mean", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firtmaxerr", "=", 
+      RowBox[{"Max", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firtminerr", "=", 
+      RowBox[{"Min", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastavgerr", "=", 
+      RowBox[{"Mean", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastmaxerr", "=", 
+      RowBox[{"Max", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastminerr", "=", 
+      RowBox[{"Min", "[", 
+       RowBox[{"errortable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firstavgangle", "=", 
+      RowBox[{"Mean", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firtmaxangle", "=", 
+      RowBox[{"Max", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firtminangle", "=", 
+      RowBox[{"Min", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "1", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastavgangle", "=", 
+      RowBox[{"Mean", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastmaxangle", "=", 
+      RowBox[{"Max", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastminangle", "=", 
+      RowBox[{"Min", "[", 
+       RowBox[{"angletable", "[", 
+        RowBox[{"[", "iter", "]"}], "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    StyleBox[
+     RowBox[{"firstti", "=", 
+      RowBox[{"titable", "[", 
+       RowBox[{"[", "1", "]"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lastti", "=", "ti"}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"firsttipoint", " ", "=", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"firstti", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", "0.1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{"lasttipoint", " ", "=", " ", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"lastti", "[", 
+           RowBox[{"[", "j", "]"}], "]"}], ",", "0.1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"j", ",", "1", ",", "P"}], "}"}]}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    StyleBox[
+     RowBox[{"firstti", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{"{", 
+        RowBox[{"Red", ",", 
+         RowBox[{"Line", "[", "firsttipoint", "]"}], ",", "Red", ",", 
+         RowBox[{"PointSize", "[", "0.025", "]"}], ",", 
+         RowBox[{"Point", "[", "firsttipoint", "]"}]}], "}"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], "\[IndentingNewLine]", 
+    StyleBox[
+     RowBox[{"lastti", "=", 
+      RowBox[{"Graphics", "[", 
+       RowBox[{"{", 
+        RowBox[{"Blue", ",", 
+         RowBox[{"Line", "[", "lasttipoint", "]"}], ",", "Blue", ",", 
+         RowBox[{"PointSize", "[", "0.025", "]"}], ",", 
+         RowBox[{"Point", "[", "lasttipoint", "]"}]}], "}"}], "]"}]}],
+     FontSize->18], 
+    StyleBox[";",
+     FontSize->18], "\[IndentingNewLine]", 
+    StyleBox["\[IndentingNewLine]",
+     FontSize->18], 
+    StyleBox[
+     RowBox[{
+      RowBox[{"TableForm", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"firstavgerr", ",", "lastavgerr"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"firtmaxerr", ",", "lastmaxerr"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"firtminerr", ",", "lastminerr"}], "}"}]}], "}"}], ",", 
+        RowBox[{"TableHeadings", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<Average error\>\"", ",", "\"\<Max error\>\"", ",", 
+             "\"\<Min error\>\""}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<First iteration\>\"", ",", "\"\<Last iteration\>\""}], 
+            "}"}]}], "}"}]}]}], "]"}], "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"TableForm", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"firstavgangle", ",", "lastavgangle"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"firtmaxangle", ",", "lastmaxangle"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"firtminangle", ",", "lastminangle"}], "}"}]}], "}"}], ",", 
+        RowBox[{"TableHeadings", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<Average angle\>\"", ",", "\"\<Max angle\>\"", ",", 
+             "\"\<Min angle\>\""}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<First iteration\>\"", ",", "\"\<Last iteration\>\""}], 
+            "}"}]}], "}"}]}]}], "]"}], "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"TableForm", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"tangenttable", "[", 
+            RowBox[{"[", "1", "]"}], "]"}], ",", 
+           RowBox[{"tangenttable", "[", 
+            RowBox[{"[", "iter", "]"}], "]"}]}], "}"}], "}"}], ",", 
+        RowBox[{"TableHeadings", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"\"\<tangent\>\"", ",", "\"\<\>\""}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<First iteration\>\"", ",", "\"\<Last iteration\>\""}], 
+            "}"}]}], "}"}]}]}], "]"}], "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"TableForm", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"{", 
+          RowBox[{"firstti", ",", "lastti"}], "}"}], "}"}], ",", 
+        RowBox[{"TableHeadings", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"\"\<t_i\>\"", ",", "\"\<\>\""}], "}"}], ",", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<First iteration\>\"", ",", "\"\<Last iteration\>\""}], 
+            "}"}]}], "}"}]}]}], "]"}], "\[IndentingNewLine]", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Show", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"firstti", ",", "lastti"}], "}"}], ",", 
+        RowBox[{"ImageSize", "\[Rule]", "Medium"}]}], "]"}], 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{"Show", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+         "datapointsplot", ",", "datalineplot", ",", "first", ",", "last"}], 
+         "}"}], ",", 
+        RowBox[{"Axes", "\[Rule]", "True"}], ",", 
+        RowBox[{"PlotRange", "\[Rule]", "All"}], ",", 
+        RowBox[{"AspectRatio", "\[Rule]", "1"}], ",", 
+        RowBox[{"ImageSize", "\[Rule]", "Medium"}]}], "]"}]}],
+     FontSize->18]}], 
+   StyleBox["\[IndentingNewLine]",
+    FontSize->18], "\[IndentingNewLine]", ",", 
+   StyleBox[
+    RowBox[{"{", 
+     RowBox[{
+      StyleBox[
+       RowBox[{"{", 
+        RowBox[{"dataset", ",", "d4"}], "}"}],
+       FontSize->18], 
+      StyleBox[",",
+       FontSize->18], 
+      RowBox[{
+       StyleBox["{",
+        FontSize->18], 
+       RowBox[{
+        RowBox[{
+         StyleBox["d1",
+          FontSize->18], 
+         StyleBox["\[Rule]",
+          FontSize->18], 
+         RowBox[{
+          StyleBox["9",
+           FontSize->18], 
+          StyleBox["_datapoints",
+           FontSize->18], 
+          StyleBox[
+           RowBox[{
+            StyleBox["_",
+             FontSize->18], "Heart"}]]}]}], 
+        StyleBox[",",
+         FontSize->18], 
+        RowBox[{
+         StyleBox["d2",
+          FontSize->18], 
+         StyleBox["\[Rule]",
+          FontSize->18], 
+         RowBox[{"31", "_datapoints", "_Random"}]}], 
+        StyleBox[",",
+         FontSize->18], 
+        RowBox[{
+         StyleBox["d3",
+          FontSize->18], 
+         StyleBox["\[Rule]",
+          FontSize->18], 
+         RowBox[{
+          StyleBox["51",
+           FontSize->18], "_datapoints", "_Random"}]}], 
+        StyleBox[",",
+         FontSize->18], 
+        RowBox[{
+         StyleBox["d4",
+          FontSize->18], 
+         StyleBox["\[Rule]",
+          FontSize->18], 
+         RowBox[{
+          StyleBox["21",
+           FontSize->18], "_datapoints", "_swirl"}]}], 
+        StyleBox[",",
+         FontSize->18], 
+        RowBox[{
+         StyleBox["d5",
+          FontSize->18], 
+         StyleBox["\[Rule]",
+          FontSize->18], 
+         RowBox[{
+          StyleBox["10",
+           FontSize->18], "_datapoints", "_y", "_equal", "_x"}]}]}], "}"}], 
+      ",", "PopupMenu"}], "}"}],
+    FontSize->18], 
+   StyleBox[",",
+    FontSize->18], 
+   StyleBox[
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "numcontrolpoint", ",", "6", ",", "\"\<# of control points\>\""}], 
+       "}"}], ",", "3", ",", 
+      RowBox[{"Length", "[", "dataset", "]"}], ",", "1"}], "}"}],
+    FontSize->18], 
+   StyleBox[",",
+    FontSize->18], 
+   StyleBox[
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"L", ",", 
+        RowBox[{"numcontrolpoint", "-", "3"}], ",", "\"\<Segment L\>\""}], 
+       "}"}], ",", "1", ",", 
+      RowBox[{"numcontrolpoint", "-", "3"}], ",", "1"}], "}"}],
+    FontSize->18], 
+   StyleBox[",",
+    FontSize->18], 
+   StyleBox[
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"iter", ",", "5", ",", "\"\<Iteration\>\""}], "}"}], ",", "1", 
+      ",", "100", ",", "1"}], "}"}],
+    FontSize->18], 
+   StyleBox[",",
+    FontSize->18], 
+   RowBox[{
+    StyleBox["ContinuousAction",
+     FontSize->18], 
+    StyleBox["\[Rule]",
+     FontSize->18], "False"}]}], 
+  StyleBox["]",
+   FontSize->18]}]}], "Input",
+ CellChangeTimes->{
+  3.6967848731254873`*^9, {3.696784940807591*^9, 3.696785112778274*^9}, {
+   3.6967851519752893`*^9, 3.696785178047922*^9}, 3.696785224631938*^9, 
+   3.696785345564039*^9, {3.696785375765131*^9, 3.696785415569067*^9}, {
+   3.6967855181901712`*^9, 3.696785574250409*^9}, {3.696785606922966*^9, 
+   3.696785621892681*^9}, {3.696785755518087*^9, 3.696785835413059*^9}, {
+   3.696785880315405*^9, 3.6967858806404467`*^9}, 3.696785941915688*^9, {
+   3.696786783664608*^9, 3.6967867906198397`*^9}, {3.6967944113902082`*^9, 
+   3.6967944609706793`*^9}, {3.696794494466381*^9, 3.6967945700567703`*^9}, {
+   3.696794706292726*^9, 3.696794773578433*^9}, {3.696794894334193*^9, 
+   3.696794928021812*^9}, {3.696794984469338*^9, 3.696794999547904*^9}, {
+   3.696795278443474*^9, 3.6967953304022293`*^9}, {3.696795367561686*^9, 
+   3.696795413497798*^9}, 3.696795457255275*^9, {3.696795537478882*^9, 
+   3.696795544653566*^9}, {3.6967956165778418`*^9, 3.696795650890233*^9}, {
+   3.6967957062976027`*^9, 3.6967957438173532`*^9}, {3.6967957935011473`*^9, 
+   3.696795902859593*^9}, {3.696795980602169*^9, 3.696796321473515*^9}, 
+   3.6967964062705507`*^9, {3.696796515658016*^9, 3.696796518975902*^9}, {
+   3.696797323894306*^9, 3.6967973541944313`*^9}, {3.696797415721266*^9, 
+   3.6967974168656387`*^9}, 3.696797480364039*^9, {3.696797551281145*^9, 
+   3.6967975526902847`*^9}, {3.696797634730213*^9, 3.696797685771797*^9}, {
+   3.696797800085034*^9, 3.696797801715968*^9}, {3.696797869237105*^9, 
+   3.696797870809926*^9}, {3.696797929670965*^9, 3.6967979314040318`*^9}, {
+   3.696797961541856*^9, 3.69679796346308*^9}, {3.696798045929697*^9, 
+   3.696798077701968*^9}, {3.696798182333831*^9, 3.6967982327254543`*^9}, {
+   3.696798393317071*^9, 3.6967985003800087`*^9}, 3.6967985424907846`*^9, {
+   3.696798700412067*^9, 3.696798726129139*^9}, {3.69679880947983*^9, 
+   3.696798815262183*^9}, {3.696798855073675*^9, 3.696798859621975*^9}, {
+   3.696798936752571*^9, 3.696798960733596*^9}, {3.696799048879341*^9, 
+   3.696799065511511*^9}, {3.696799148285269*^9, 3.696799155437585*^9}, {
+   3.696799214834927*^9, 3.696799239301354*^9}, {3.6967993227526073`*^9, 
+   3.6967993255073833`*^9}, {3.6967993592283897`*^9, 3.696799382314528*^9}, {
+   3.696801175743079*^9, 3.696801191598302*^9}, {3.696801725926064*^9, 
+   3.696801775335929*^9}, {3.696801857475026*^9, 3.696801868425419*^9}, {
+   3.6968019374192133`*^9, 3.696801941712463*^9}, {3.6968020605983067`*^9, 
+   3.69680220735467*^9}, {3.696802303842556*^9, 3.696802337239406*^9}, {
+   3.69680236948242*^9, 3.696802399797874*^9}, {3.6968151920025663`*^9, 
+   3.6968152515762053`*^9}, 3.69681530202982*^9, {3.696815371726719*^9, 
+   3.6968154560745707`*^9}, {3.6968155262375317`*^9, 3.696815534681785*^9}, {
+   3.696815572536811*^9, 3.696815594318193*^9}, {3.696815625856942*^9, 
+   3.696815658202239*^9}, {3.696815739825519*^9, 3.6968157419676857`*^9}, 
+   3.696816148174757*^9, 3.69681618727498*^9, {3.696816241503099*^9, 
+   3.696816263868363*^9}, {3.696816378962688*^9, 3.696816380223899*^9}, {
+   3.696816467466936*^9, 3.6968164737220163`*^9}, 3.696818327557837*^9, {
+   3.696818503902513*^9, 3.6968185188625793`*^9}, {3.696818586240017*^9, 
+   3.696818587624507*^9}, {3.696818634223898*^9, 3.696818672498035*^9}, {
+   3.696818716782536*^9, 3.696818719425579*^9}, 3.6968187976265907`*^9, {
+   3.696820163805997*^9, 3.69682020486908*^9}, {3.696820279381508*^9, 
+   3.696820301248063*^9}, {3.696820378168519*^9, 3.696820382200667*^9}, {
+   3.6968204217263193`*^9, 3.69682042453675*^9}, {3.6968205347591677`*^9, 
+   3.696820543278756*^9}, {3.696820649218431*^9, 3.696820650082996*^9}, {
+   3.696820761725067*^9, 3.69682081730324*^9}, {3.696820876962597*^9, 
+   3.696820917816318*^9}, {3.6968210532009497`*^9, 3.6968211321744347`*^9}, {
+   3.6968213219041452`*^9, 3.696821326124998*^9}, {3.696821379190591*^9, 
+   3.696821380790707*^9}, {3.696821523239311*^9, 3.6968215240199823`*^9}, {
+   3.6968216750132933`*^9, 3.696821743225025*^9}, {3.696821824134857*^9, 
+   3.69682184876398*^9}, {3.6968658920193863`*^9, 3.696865959924015*^9}, {
+   3.6968660243948803`*^9, 3.6968661680436077`*^9}, {3.696867127644264*^9, 
+   3.696867151674068*^9}, {3.696867367306508*^9, 3.6968673915480537`*^9}, {
+   3.6968674444361277`*^9, 3.6968674513576803`*^9}, {3.6968674828644543`*^9, 
+   3.6968675132073402`*^9}, {3.6968675432405367`*^9, 
+   3.6968675443159924`*^9}, {3.696867966563936*^9, 3.6968679733788223`*^9}, 
+   3.69686824848603*^9, {3.696868279120307*^9, 3.696868360419763*^9}, {
+   3.696868409191803*^9, 3.696868440540028*^9}, {3.696868486119583*^9, 
+   3.696868510868742*^9}, {3.696868611136106*^9, 3.69686863382792*^9}, {
+   3.696868877861315*^9, 3.696868961835659*^9}, {3.696869108799921*^9, 
+   3.6968691850237093`*^9}, {3.696869245838889*^9, 3.696869258529764*^9}, {
+   3.696871083862832*^9, 3.6968710891614923`*^9}, {3.696871794408566*^9, 
+   3.696872035458222*^9}, {3.696872085402611*^9, 3.696872086988982*^9}, {
+   3.6968721614073067`*^9, 3.696872168810914*^9}, {3.696872264594693*^9, 
+   3.696872274404006*^9}, {3.6968723757713213`*^9, 3.696872377591823*^9}, {
+   3.696872410051231*^9, 3.696872431680942*^9}, {3.6968736897847548`*^9, 
+   3.696873718361178*^9}, {3.6968738634928007`*^9, 3.696873866249208*^9}, {
+   3.696874028154338*^9, 3.696874039291442*^9}, {3.6968741830944242`*^9, 
+   3.6968742084678993`*^9}, {3.696874270059836*^9, 3.6968742862621737`*^9}, {
+   3.6968774265191717`*^9, 3.696877426752922*^9}, {3.696878183775342*^9, 
+   3.696878276427691*^9}, {3.696878338230978*^9, 3.6968783590478153`*^9}, {
+   3.6968788618811903`*^9, 3.696878893337838*^9}, {3.696887225802725*^9, 
+   3.696887226863361*^9}, {3.696888797308013*^9, 3.69688882498206*^9}, {
+   3.696888884779193*^9, 3.696888992488619*^9}, {3.696889146036416*^9, 
+   3.696889148282887*^9}, {3.696889227710443*^9, 3.696889318970368*^9}, {
+   3.696889404971334*^9, 3.6968894880831203`*^9}, {3.696889540502509*^9, 
+   3.6968895967700243`*^9}, {3.696889640791582*^9, 3.696889647436776*^9}, {
+   3.696889689598249*^9, 3.696889792909031*^9}, {3.696889823124655*^9, 
+   3.696889844511942*^9}, {3.6968898828480988`*^9, 3.6968899136611023`*^9}, {
+   3.696891797779595*^9, 3.696891798287437*^9}, {3.6968919917661*^9, 
+   3.6968921157009277`*^9}, {3.696892151518098*^9, 3.696892184967016*^9}, {
+   3.696892236929887*^9, 3.6968925530200977`*^9}, {3.696892586429669*^9, 
+   3.696892600207142*^9}, {3.696892635393838*^9, 3.6968926585181313`*^9}, {
+   3.6968926990143213`*^9, 3.6968927299561768`*^9}, {3.696892808529996*^9, 
+   3.6968928557202663`*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`dataset$$ = CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+    "], $CellContext`iter$$ = 
+    5, $CellContext`L$$ = -3 + $CellContext`numcontrolpoint$$, \
+$CellContext`numcontrolpoint$$ = 6, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{{
+       Hold[$CellContext`dataset$$], CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+       
+       "]}, {{{6, 6}, {3, 9}, {0, 6}, {2, 2}, {6, 0}, {10, 2}, {12, 6}, {9, 
+         9}, {6, 6.1}} -> 
+       9 Blank[$CellContext`datapoints] 
+        Blank[$CellContext`Heart], CompressedData["
+1:eJxTTMoPSmViYGCQB2IQDQOlG3N+xKRdsQ8Fg6v2Z35cv353yTMo/6l9ssaB
+J6JSb+0hqj/YL9buPTo97ANU/qu90DcRn5LrX+xXgcEv+5DAnqTTnL+h6hkc
+4i3EuM8H/4LKMzlkGrtenKTwC6qf1SFkxeSz2W0w9RwOSyb31Dv1MzhA1HM5
++CXN6dvlxegAUc/rIJTGNOWEIaMDRL2Ag+JarjMFJjB5QYeH205uaV8J0y/k
+ECnuaC5kwwJVL+KQlLk/uCeMCape1IH75qns+bqsUPViDn13unY/mAJTL+Ew
+m6dxsdtOZqh6SYctzLMPfCmAqZdysOTZ6P7sHytUvYzDdqFvzqyVrFD1sg6p
+xs0tYYYcUPVyDp8tPvFr+7JD1Ss48L9MW33SCiav4HBsl+ryJUUcUP2KDgVe
+lwoX+nJC1Ss5lHX5vNnynguqXsmh6Mbts0GM3FD1yg6ihVYHjJZwQdWrOMS7
+zmD1XMflAADForPw
+        "] -> 
+       31 Blank[$CellContext`datapoints] Blank[Random], CompressedData["
+1:eJw1kW1IU1EcxsVFoYh+0QrRqQi+pPhFsxHo86Va+UHRQgkmgZmmFprKgiVq
+pL1RqaVIGqFOqXxD02zi6rQ2XJra3CZ7wbnNzbe5ZrqMoMC8u6cHDpd7zz3P
+8/s/JyKvNOuKt5eXV+L+Yp7/xYNsaO9gJ24FDvKtomakTUu1sR12+t6NXoe8
+0f54CxJu/WamZBCh0VEuZcUW3R+FRjjdqu+0ou05o3E0Kib+vg/uoP9/hLC3
+y8d1zUScmcwXGWYzak/cy3YQ9rwCqsj5MP74BvHVictSfJW4b8nglD5cJKzf
+FN6eEQoHZUOIFTR83o2ZQR/P/+RwsoX6z0FyJFpc3L+O7v3TOrEKLe/knNwe
+B9i8ebSH+W24BRYkeqRBwOmg7eBhMeXXQvSmqLXabSTy3Zj9hAV8+pkjvS5Y
+oTw6VL5OPuRttpEsT6AeBRHh4/wLGspnwMtzSZyFIxJYRYyhET6T8facKhPl
+XUT8+ZZHzW123GDwykzgu8PjicRG+ZeQd0x63FxrAHsbFixPjMTE8AfoPBZM
+J6mVztQFcpYNQLmwxP3igIX2aUUtp4h7qcZCmDRBwzK6ik2yKuM3ws5rQ1/k
+TqVf+jDYcWw4OhNXVpJupPPb4Yyz5nLLLQhjcLgrWM1ajO23m8H2sYJ875CQ
+U7+1KCxgtAr5nZ7qhNs9YPtZQ5U0tM5wWEUYt8DBNcgefKhUyIy0r3VsKyOz
+U4p15Bdjt7uOAvfoF2vAPO1vA4a29qGisQ6kegwdyOetqmw6Ne3Tgc60aY1o
+zwgPXv0m9IUXnU2Xl2i/Trh2Ju9OxakxO8PIiQ65/mtL/gjt+zuEr5r9o24q
+SJAH0IW5JW5NRYKWsP27EFUnffJsTU08doItuMxNAys8Qtj7+AHRn6tPlwfG
+8A9ezagU
+        "] -> 
+       51 Blank[$CellContext`datapoints] Blank[Random], CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+        "] -> 
+       21 Blank[$CellContext`datapoints] Blank[$CellContext`swirl], {{0, 0}, {
+        1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9, 
+        9}, {10, 10}} -> 
+       10 Blank[$CellContext`datapoints] Blank[$CellContext`equal] 
+        Blank[$CellContext`x] Blank[$CellContext`y]}}, {{
+       Hold[$CellContext`numcontrolpoint$$], 6, "# of control points"}, 3, 
+      Dynamic[
+       Length[$CellContext`dataset$$]], 1}, {{
+       Hold[$CellContext`L$$], -3 + $CellContext`numcontrolpoint$$, 
+       "Segment L"}, 1, 
+      Dynamic[$CellContext`numcontrolpoint$$ - 3], 1}, {{
+       Hold[$CellContext`iter$$], 5, "Iteration"}, 1, 100, 1}}, 
+    Typeset`size$$ = {783.3000001907349, {612.134033203125, 182.}}, 
+    Typeset`update$$ = 0, Typeset`initDone$$, Typeset`skipInitDone$$ = 
+    True, $CellContext`dataset$80192$$ = 
+    False, $CellContext`numcontrolpoint$80193$$ = 0, $CellContext`L$80194$$ = 
+    0, $CellContext`iter$80195$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`dataset$$ = CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+         "], $CellContext`iter$$ = 
+        5, $CellContext`L$$ = -3 + $CellContext`numcontrolpoint$$, \
+$CellContext`numcontrolpoint$$ = 6}, "ControllerVariables" :> {
+        Hold[$CellContext`dataset$$, $CellContext`dataset$80192$$, False], 
+        Hold[$CellContext`numcontrolpoint$$, \
+$CellContext`numcontrolpoint$80193$$, 0], 
+        Hold[$CellContext`L$$, $CellContext`L$80194$$, 0], 
+        Hold[$CellContext`iter$$, $CellContext`iter$80195$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, 
+      "Body" :> ($CellContext`data = $CellContext`dataset$$; \
+$CellContext`datapointsplot = Graphics[{Black, 
+           PointSize[0.015], 
+           Point[$CellContext`data], 
+           PointSize[0.02], 
+           Point[
+            Part[$CellContext`data, 1]]}]; $CellContext`datalineplot = 
+        ListLinePlot[$CellContext`data]; $CellContext`P = 
+        Length[$CellContext`data]; $CellContext`d = \
+$CellContext`numcontrolpoint$$ - $CellContext`L$$; $CellContext`controlpoint = 
+        Table[
+          
+          Table[{0, 
+           0}, {$CellContext`j, 
+            1, $CellContext`numcontrolpoint$$}], {$CellContext`i, 1, 
+           100}]; $CellContext`errortable = Table[
+          Table[
+          0, {$CellContext`j, 1, $CellContext`P}], {$CellContext`i, 1, 
+           100}]; $CellContext`angletable = Table[
+          Table[
+          0, {$CellContext`j, 1, $CellContext`P}], {$CellContext`i, 1, 
+           100}]; $CellContext`tangenttable = Table[
+          
+          Table[{0, 0}, {$CellContext`j, 1, $CellContext`P}], {$CellContext`i,
+            1, 100}]; $CellContext`titable = Table[
+          Table[
+          0, {$CellContext`j, 1, $CellContext`P}], {$CellContext`i, 1, 
+           100}]; $CellContext`ti = $CellContext`uparam[$CellContext`data]; 
+       Do[Part[$CellContext`titable, $CellContext`k] = $CellContext`ti; \
+$CellContext`ctrlparameter = \
+$CellContext`ctrlparam[$CellContext`numcontrolpoint$$, $CellContext`data, \
+$CellContext`ti]; $CellContext`knot = $CellContext`kfun[$CellContext`d, \
+$CellContext`ctrlparameter]; $CellContext`ctrlpts = LeastSquares[
+            $CellContext`mbasis[$CellContext`data, \
+$CellContext`numcontrolpoint$$, $CellContext`d, $CellContext`knot], \
+$CellContext`data]; 
+         Part[$CellContext`controlpoint, $CellContext`k] = \
+$CellContext`ctrlpts; $CellContext`numcontrolpoint$$ = 
+          Length[$CellContext`ctrlpts]; $CellContext`conparam = \
+$CellContext`uparam[$CellContext`ctrlpts]; $CellContext`conknot = \
+$CellContext`kfun[$CellContext`d, $CellContext`conparam]; $CellContext`ti = \
+$CellContext`correction[$CellContext`k, $CellContext`ti, $CellContext`P, \
+$CellContext`data, $CellContext`ctrlpts, $CellContext`conknot, \
+$CellContext`d], {$CellContext`k, 
+          1, $CellContext`iter$$}]; $CellContext`first = Graphics[{Red, 
+           BSplineCurve[
+            Part[$CellContext`controlpoint, 1], 
+            SplineDegree -> $CellContext`d], Orange, 
+           Line[
+            Part[$CellContext`controlpoint, 1]], Orange, 
+           Point[
+            Part[$CellContext`controlpoint, 1]]}]; $CellContext`last = 
+        Graphics[{Blue, 
+           BSplineCurve[
+            Part[$CellContext`controlpoint, $CellContext`iter$$], 
+            SplineDegree -> $CellContext`d], Cyan, 
+           Line[
+            Part[$CellContext`controlpoint, $CellContext`iter$$]], Cyan, 
+           Point[
+            
+            Part[$CellContext`controlpoint, $CellContext`iter$$]]}]; \
+$CellContext`firstavgerr = Mean[
+          Part[$CellContext`errortable, 1]]; $CellContext`firtmaxerr = Max[
+          Part[$CellContext`errortable, 1]]; $CellContext`firtminerr = Min[
+          Part[$CellContext`errortable, 1]]; $CellContext`lastavgerr = Mean[
+          
+          Part[$CellContext`errortable, $CellContext`iter$$]]; \
+$CellContext`lastmaxerr = Max[
+          
+          Part[$CellContext`errortable, $CellContext`iter$$]]; \
+$CellContext`lastminerr = Min[
+          
+          Part[$CellContext`errortable, $CellContext`iter$$]]; \
+$CellContext`firstavgangle = Mean[
+          Part[$CellContext`angletable, 1]]; $CellContext`firtmaxangle = Max[
+          Part[$CellContext`angletable, 1]]; $CellContext`firtminangle = Min[
+          Part[$CellContext`angletable, 1]]; $CellContext`lastavgangle = 
+        Mean[
+          
+          Part[$CellContext`angletable, $CellContext`iter$$]]; \
+$CellContext`lastmaxangle = Max[
+          
+          Part[$CellContext`angletable, $CellContext`iter$$]]; \
+$CellContext`lastminangle = Min[
+          
+          Part[$CellContext`angletable, $CellContext`iter$$]]; \
+$CellContext`firstti = 
+        Part[$CellContext`titable, 
+          1]; $CellContext`lastti = $CellContext`ti; \
+$CellContext`firsttipoint = Table[{
+           Part[$CellContext`firstti, $CellContext`j], 0.1}, {$CellContext`j, 
+           1, $CellContext`P}]; $CellContext`lasttipoint = Table[{
+           Part[$CellContext`lastti, $CellContext`j], 0.1}, {$CellContext`j, 
+           1, $CellContext`P}]; $CellContext`firstti = Graphics[{Red, 
+           Line[$CellContext`firsttipoint], Red, 
+           PointSize[0.025], 
+           Point[$CellContext`firsttipoint]}]; $CellContext`lastti = 
+        Graphics[{Blue, 
+           Line[$CellContext`lasttipoint], Blue, 
+           PointSize[0.025], 
+           Point[$CellContext`lasttipoint]}]; 
+       TableForm[{{$CellContext`firstavgerr, $CellContext`lastavgerr}, \
+{$CellContext`firtmaxerr, $CellContext`lastmaxerr}, {$CellContext`firtminerr, \
+$CellContext`lastminerr}}, 
+          TableHeadings -> {{"Average error", "Max error", "Min error"}, {
+            "First iteration", "Last iteration"}}] 
+        TableForm[{{$CellContext`firstavgangle, $CellContext`lastavgangle}, \
+{$CellContext`firtmaxangle, $CellContext`lastmaxangle}, \
+{$CellContext`firtminangle, $CellContext`lastminangle}}, 
+          TableHeadings -> {{"Average angle", "Max angle", "Min angle"}, {
+            "First iteration", "Last iteration"}}] TableForm[{{
+            Part[$CellContext`tangenttable, 1], 
+            Part[$CellContext`tangenttable, $CellContext`iter$$]}}, 
+          TableHeadings -> {{"tangent", ""}, {
+            "First iteration", "Last iteration"}}] 
+        TableForm[{{$CellContext`firstti, $CellContext`lastti}}, 
+          TableHeadings -> {{"t_i", ""}, {
+            "First iteration", "Last iteration"}}] 
+        Show[{$CellContext`firstti, $CellContext`lastti}, ImageSize -> Medium]
+          
+        Show[{$CellContext`datapointsplot, $CellContext`datalineplot, \
+$CellContext`first, $CellContext`last}, Axes -> True, PlotRange -> All, 
+          AspectRatio -> 1, ImageSize -> Medium]), 
+      "Specifications" :> {{{$CellContext`dataset$$, CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+          
+          "]}, {{{6, 6}, {3, 9}, {0, 6}, {2, 2}, {6, 0}, {10, 2}, {12, 6}, {9,
+             9}, {6, 6.1}} -> 
+          9 Blank[$CellContext`datapoints] 
+           Blank[$CellContext`Heart], CompressedData["
+1:eJxTTMoPSmViYGCQB2IQDQOlG3N+xKRdsQ8Fg6v2Z35cv353yTMo/6l9ssaB
+J6JSb+0hqj/YL9buPTo97ANU/qu90DcRn5LrX+xXgcEv+5DAnqTTnL+h6hkc
+4i3EuM8H/4LKMzlkGrtenKTwC6qf1SFkxeSz2W0w9RwOSyb31Dv1MzhA1HM5
++CXN6dvlxegAUc/rIJTGNOWEIaMDRL2Ag+JarjMFJjB5QYeH205uaV8J0y/k
+ECnuaC5kwwJVL+KQlLk/uCeMCape1IH75qns+bqsUPViDn13unY/mAJTL+Ew
+m6dxsdtOZqh6SYctzLMPfCmAqZdysOTZ6P7sHytUvYzDdqFvzqyVrFD1sg6p
+xs0tYYYcUPVyDp8tPvFr+7JD1Ss48L9MW33SCiav4HBsl+ryJUUcUP2KDgVe
+lwoX+nJC1Ss5lHX5vNnynguqXsmh6Mbts0GM3FD1yg6ihVYHjJZwQdWrOMS7
+zmD1XMflAADForPw
+           "] -> 
+          31 Blank[$CellContext`datapoints] Blank[Random], CompressedData["
+1:eJw1kW1IU1EcxsVFoYh+0QrRqQi+pPhFsxHo86Va+UHRQgkmgZmmFprKgiVq
+pL1RqaVIGqFOqXxD02zi6rQ2XJra3CZ7wbnNzbe5ZrqMoMC8u6cHDpd7zz3P
+8/s/JyKvNOuKt5eXV+L+Yp7/xYNsaO9gJ24FDvKtomakTUu1sR12+t6NXoe8
+0f54CxJu/WamZBCh0VEuZcUW3R+FRjjdqu+0ou05o3E0Kib+vg/uoP9/hLC3
+y8d1zUScmcwXGWYzak/cy3YQ9rwCqsj5MP74BvHVictSfJW4b8nglD5cJKzf
+FN6eEQoHZUOIFTR83o2ZQR/P/+RwsoX6z0FyJFpc3L+O7v3TOrEKLe/knNwe
+B9i8ebSH+W24BRYkeqRBwOmg7eBhMeXXQvSmqLXabSTy3Zj9hAV8+pkjvS5Y
+oTw6VL5OPuRttpEsT6AeBRHh4/wLGspnwMtzSZyFIxJYRYyhET6T8facKhPl
+XUT8+ZZHzW123GDwykzgu8PjicRG+ZeQd0x63FxrAHsbFixPjMTE8AfoPBZM
+J6mVztQFcpYNQLmwxP3igIX2aUUtp4h7qcZCmDRBwzK6ik2yKuM3ws5rQ1/k
+TqVf+jDYcWw4OhNXVpJupPPb4Yyz5nLLLQhjcLgrWM1ajO23m8H2sYJ875CQ
+U7+1KCxgtAr5nZ7qhNs9YPtZQ5U0tM5wWEUYt8DBNcgefKhUyIy0r3VsKyOz
+U4p15Bdjt7uOAvfoF2vAPO1vA4a29qGisQ6kegwdyOetqmw6Ne3Tgc60aY1o
+zwgPXv0m9IUXnU2Xl2i/Trh2Ju9OxakxO8PIiQ65/mtL/gjt+zuEr5r9o24q
+SJAH0IW5JW5NRYKWsP27EFUnffJsTU08doItuMxNAys8Qtj7+AHRn6tPlwfG
+8A9ezagU
+           "] -> 
+          51 Blank[$CellContext`datapoints] Blank[Random], CompressedData["
+1:eJwBYQGe/iFib1JlAgAAABUAAAACAAAAF1UeSTfs1z8HheR7pJfKP85ec3Cc
+Fek/LJJImcyH2z8WspOqDn3pPyBsqDtnuOs/ejypXtxT3j+8FjCbrU/9PynQ
+f2nphuK/5cFNfLRHAUCo8YSnT2H9v2JE9KhwHPk/ZabvDBqtBMATwSXWWFPe
+P9QzxOEKkgfA4LAsh+6Y8r9bDRfYnekEwG0dxWTMGwbApEYk+3sj5L9YUk6X
+CbEQwArimOcA/vg/601NfdMxEsDT6SSSWSwQQP8y+DOBrw7ARuci99NnF0C9
+Me5KLC/6v6sBuz3ifxpA+/Q9scN99j+kgL6pUrUWQB9tZj7/MBNAKtW6odUI
+BUDwbKx6zDEcQG54sl+vNO6/LTgyMv06IEB485vIb5cTwBFoDtcL2BtA9SXt
+nF1EIMCFxWIJ5yAQQOUkrTrK0CLADv3qN44L5L+FIl1nDlYgwMWL8pzeSRXA
+fE2lqg==
+           "] -> 
+          21 Blank[$CellContext`datapoints] Blank[$CellContext`swirl], {{0, 
+           0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 
+           8}, {9, 9}, {10, 10}} -> 
+          10 Blank[$CellContext`datapoints] Blank[$CellContext`equal] 
+           Blank[$CellContext`x] Blank[$CellContext`y]}, ControlType -> 
+         PopupMenu}, {{$CellContext`numcontrolpoint$$, 6, 
+          "# of control points"}, 3, 
+         Dynamic[
+          Length[$CellContext`dataset$$]], 
+         1}, {{$CellContext`L$$, -3 + $CellContext`numcontrolpoint$$, 
+          "Segment L"}, 1, 
+         Dynamic[$CellContext`numcontrolpoint$$ - 3], 
+         1}, {{$CellContext`iter$$, 5, "Iteration"}, 1, 100, 1}}, 
+      "Options" :> {ContinuousAction -> False}, "DefaultOptions" :> {}],
+     ImageSizeCache->{829., {482., 488.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UndoTrackedVariables:>{Typeset`show$$, Typeset`bookmarkMode$$},
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Manipulate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{{3.696892592681755*^9, 3.696892602696589*^9}, 
+   3.696892662151053*^9, 3.696892704346982*^9, 3.6968927653609056`*^9, {
+   3.696892831909253*^9, 3.696892858102556*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ StyleBox["\nError Report",
+  FontSize->24,
+  FontWeight->"Bold"],
+ StyleBox["\n",
+  FontSize->18],
+ StyleBox["There is an error when the data points are y=x, x=1~10. The \
+problem is because of the cosine value is a complex number. I\
+\[CloseCurlyQuote]ve tried to implement this dataset only on Least Square \
+approximation, and it looks good. But combine it with parameter correction, \
+it would have the problem. I have no idea how to solve it.",
+  FontSize->16],
+ StyleBox["\n\n",
+  FontSize->18],
+ StyleBox["Discussion",
+  FontSize->24,
+  FontWeight->"Bold"],
+ "\n",
+ StyleBox["1. Describe the problem and the solution. ",
+  FontSize->18],
+ "\n",
+ StyleBox["Problem:",
+  FontSize->18,
+  FontWeight->"Bold"],
+ "\n",
+ StyleBox["We want point x(t_i) on the B-spline curve to close to the \
+original data point p_i, so we need to do parameter correction to correct the \
+t_i.",
+  FontSize->16],
+ "\n\n",
+ StyleBox["Solution:",
+  FontSize->18,
+  FontWeight->"Bold"],
+ "\n",
+ StyleBox["Step1: Find the chord length parameters t_i for the p_i.",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["\nIf the data points are D(0), D(1),..., D(n),\nthe total chord \
+length L=Sum[ | D(i) - D(i-1) | ], i=1~n\nand the chord length from D(0) to \
+D(k) would be L_k=Sum[ | D(i) - D(i-1) | ], i=1~k \nso the parameter t_k in \
+domain [0,1] would equal to L_k/L (the chord length from D(0) to D(k) divided \
+by the total length).\n",
+  FontSize->16],
+ "\n",
+ StyleBox["Step2:  Do Least Square approximation to create control points",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["\nFirst, we need to generate clamped knots for a given number of \
+control points and degrees. Then, use BSplineBasis[] to define the B-spline \
+basis matrix for least squares.\nFinally, use the LeastSquares[] to get the \
+control points.\n",
+  FontSize->16],
+ "\n",
+ StyleBox["Step3: Define B-spline curve with control points",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["\nAfter getting the control points, we need to find the control \
+points\[CloseCurlyQuote] chord length parameter ct_i, the method is same as \
+step1. Then generate knots from this ct_i. With control points and knots, we \
+can use BSplineBasis[] to define a B-spline curve.\n",
+  FontSize->16],
+ "\n",
+ StyleBox["Step4: t_i parameter correction",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["\nFirst, we need to find the angle between curve tangent vector at \
+point x(t_i) and the vector from curve point x(t_i) to data point p_i. If the \
+angle is not 90 degrees, it means that the t_i need to be modified. To \
+modified t_i, we need to change the original t_i to the point which is the \
+projection point of p_i project to the curve tangent vector.  The correction \
+equation is t_i = t_i + (L/S)u, where L is the distance between x(t_i) and \
+the projection point, S is the curve total length, and we can set u equals to \
+1. The value L can be found by using Trigonometric, which L=(distance between \
+curve point x(t_i) to data point p_i)*cosine(angle between curve tangent \
+vector at point x(t_i) and the vector from curve point x(t_i) to data point \
+p_i).\n\n",
+  FontSize->16],
+ StyleBox["Step5: Repeat from step 2 to 4 with n iteration",
+  FontSize->16,
+  FontWeight->"Bold"],
+ "\n\n",
+ StyleBox["2. How did you determine your code is correct?",
+  FontSize->18],
+ "\n",
+ StyleBox["As the increase of correction iteration, the last iteration error \
+value would decrease significantly. We can compare the last iteration \
+B-spline curve(blue curve in my implement) with first iteration curve(red \
+curve in my implement), the result should be that the last iteration curve \
+would be closer to the original data points than the first iteration curve. \n\
+",
+  FontSize->16],
+ "\n",
+ StyleBox["3. Observations and conclusions",
+  FontSize->18],
+ "\n",
+ StyleBox["Observation-1:\n",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["When getting the curve tangent, I use curve\[CloseCurlyQuote][] \
+which is the first derivative of the curve; however, it would have a problem \
+when getting the tangent value at point x(t_1) and point x(t_P) on the curve \
+because it would have no value at these two points. So, I set the error(t_1) \
+and error(t_P) into 0. I think it\[CloseCurlyQuote]s reasonable because t_1 \
+and t_P should maintain 0 and 1 respectively. That\[CloseCurlyQuote]s why the \
+minimum error value and the minimum angle at the first and last iteration are \
+all 0.\n\n",
+  FontSize->16],
+ StyleBox["Observation-2:",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox[" \nWhen updating the t_i values, there is possible that the new \
+t_k value becomes greater than t_k+1 or smaller than t_k-1. It would cause to \
+have a non-increasing t_i values and knots values. My solution is that I \
+would not update the t_k which has above problem.\n\n",
+  FontSize->16],
+ StyleBox["Conclusion:",
+  FontSize->16,
+  FontWeight->"Bold"],
+ StyleBox["\nAs the number of control points increases, the curve becomes \
+closer to the original data since more control points have a higher \
+flexibility of the approximation curve. And a higher degree has better result \
+since high degree B-spline is more flexible. However, if the first \
+approximation was far from the optimal situation, the parameter correction \
+may not be stable. \nIn this homework, I\[CloseCurlyQuote]ve learned \
+thoroughly how the B-spline curve works, how least square approximation works \
+when facing a great number of data, and the whole process of parameter \
+correction. It\[CloseCurlyQuote]s very exciting when the desired result come \
+up.\n",
+  FontSize->16],
+ "\n",
+ StyleBox["4. How many parameter correction steps are needed/useful? Does it \
+work? Does it become unstable?",
+  FontSize->18],
+ "\n",
+ StyleBox["About 4 to 5 iterations are needed. After about 5 iterations, the \
+correction effect becomes not obvious. The error values still decrease but it \
+changes very small each following iteration.\n",
+  FontSize->16],
+ "\n",
+ StyleBox["5. Can a B-spline approximation to a given data set always be \
+found?  ",
+  FontSize->18],
+ "\n",
+ StyleBox["I think it can be found. However, if the data points are unevenly \
+distributed or contain noise points, the B-spline approximation might fail to \
+produce nice results. \n",
+  FontSize->16],
+ "\n"
+}], "Text",
+ CellChangeTimes->{{3.6968913011816673`*^9, 3.696891366945363*^9}, {
+  3.6968914324521027`*^9, 3.696891522467318*^9}, {3.6968918793351927`*^9, 
+  3.6968919036286297`*^9}}]
+},
+WindowSize->{1282, 694},
+WindowMargins->{{4, Automatic}, {6, Automatic}},
+FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
+21, 2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 955, 21, 307, "Text"],
+Cell[CellGroupData[{
+Cell[1538, 45, 49418, 1398, 3315, "Input"],
+Cell[50959, 1445, 16622, 318, 998, "Output"]
+}, Open  ]],
+Cell[67596, 1766, 6499, 151, 1454, "Text"]
+}
+]
+*)
+
